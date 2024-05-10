@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/todo_model.dart';
-import '../providers/auth_provider.dart';
 import '../providers/todo_provider.dart';
+import '../providers/auth_provider.dart';
+import 'signin_page.dart';
 import 'modal_todo.dart';
 import 'user_details_page.dart';
 
@@ -17,7 +20,39 @@ class TodoPage extends StatefulWidget {
 class _TodoPageState extends State<TodoPage> {
   @override
   Widget build(BuildContext context) {
+    print("In ToDo Page");
+    Stream<User?> userStream = context.watch<UserAuthProvider>().userStream;
     Stream<QuerySnapshot> todosStream = context.watch<TodoListProvider>().todo;
+
+    print(userStream);
+    return StreamBuilder(
+        stream: userStream,
+        builder: (context, snapshot) {
+          print("Todo User $snapshot");
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            //why entering here when uStream has user?
+            print("stuck here");
+            print(snapshot);
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (!snapshot.hasData) {
+            // if user is logged in, display the scaffold containing the streambuilder for the todos
+            return const SignInPage();
+          }
+          print("signed in todopage");
+
+          return displayScaffold(context, todosStream);
+        });
+  }
+
+  Scaffold displayScaffold(context, todosStream) {
+    print("in displayScaffold()");
+
     return Scaffold(
       drawer: drawer,
       appBar: AppBar(
@@ -25,7 +60,8 @@ class _TodoPageState extends State<TodoPage> {
       ),
       body: StreamBuilder(
         stream: todosStream,
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot snapshot) {
+          //Added AsyncSnapshot so no more docs error https://stackoverflow.com/questions/67840643/flutter-error-the-getter-docs-isnt-defined-for-the-type-object
           if (snapshot.hasError) {
             return Center(
               child: Text("Error encountered! ${snapshot.error}"),

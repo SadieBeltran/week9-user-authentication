@@ -14,13 +14,13 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    user = context.read<UserAuthProvider>().user;
+    user = context.read<UserAuthProvider>().userObj;
     return Scaffold(
         appBar: AppBar(
           title: const Text("Details"),
         ),
         body: Container(
-          margin: EdgeInsets.all(30),
+          margin: const EdgeInsets.all(30),
           child: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

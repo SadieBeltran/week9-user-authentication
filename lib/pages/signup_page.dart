@@ -79,13 +79,14 @@ class _SignUpState extends State<SignUpPage> {
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
           _formKey.currentState!.save();
-          await context
-              .read<UserAuthProvider>()
-              .authService
-              .signUp(email!, password!);
+          await context.read<UserAuthProvider>().signUp(email!, password!);
+          // await context
+          //     .read<UserAuthProvider>()
+          //     .authService
+          //     .signUp(email!, password!);
 
           // check if the widget hasn't been disposed of after an asynchronous action
-          if (mounted) Navigator.pop(context);
+          if (mounted) Navigator.pop(context); //go back to the signin page?
         }
       },
       child: const Text("Sign Up"));
